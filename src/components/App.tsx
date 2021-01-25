@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import MainPage from '../MainPage/MainPage';
+import MainPage from './MainPage';
 
 const App = () => (
   <>

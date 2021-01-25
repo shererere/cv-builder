@@ -1,6 +1,6 @@
 import React, { MouseEventHandler, ReactNode } from 'react';
 import styled from 'styled-components';
-import theme from '../../styles/theme';
+import theme from '../styles/theme';
 
 interface ButtonProps {
   onClick?: MouseEventHandler<HTMLButtonElement>;

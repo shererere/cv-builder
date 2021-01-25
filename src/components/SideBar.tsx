@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import theme from '../../styles/theme';
-import Button from '../Button/Button';
-import { usePopup } from '../../modules/Popup/PopupModule';
+import theme from '../styles/theme';
+import Button from './Button';
+import { usePopup } from '../modules/Popup/PopupModule';
 
 const Wrapper = styled.div`
   align-self: stretch;

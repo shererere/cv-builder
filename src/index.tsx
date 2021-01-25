@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App/App';
+import App from './components/App';
 import reportWebVitals from './reportWebVitals';
 import './styles/global.css';
 import { PopupModule } from './modules/Popup/PopupModule';

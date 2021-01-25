@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import SideBar from '../SideBar/SideBar';
+import SideBar from './SideBar';
+import Page from './Page';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import theme from '../../styles/theme'; 
+import theme from '../styles/theme'; 
 
 const Wrapper = styled.div`
   display: flex;
@@ -22,24 +23,18 @@ const PageWrapper = styled.div`
   background: ${theme.background};
 `;
 
-const Page = styled.div`
-  width: 21cm;
-  height: 29.7cm;
-  background: #fff;
-`;
-
 PageWrapper.defaultProps = {
   theme,
 };
 
 const MainPage = () => {
-  const pageRef = useRef(null);
-  const pageWrapperRef = useRef(null);
+  const [scale, setScale] = useState(0.75);
+  const [isHoldingWheel, setIsHoldingWheel] = useState(false);
 
   const transformWrapperProps = {
     defaultPositionX: 100,
     defaultPositionY: 25,
-    defaultScale: 0.75,
+    defaultScale: scale,
     options: {
       minScale: 0.2,
       centerContent: false,
@@ -48,15 +43,31 @@ const MainPage = () => {
     scalePadding: {
       disabled: true,
     },
+    pan: {
+      disabled: !isHoldingWheel,
+    },
+    onZoomChange: (data: any) => {
+      setScale(data.scale);
+    },
+  };
+
+  const onMouseDown = (event: any) => {
+    if (event.button !== 1) return; 
+    setIsHoldingWheel(true);
+  };
+  
+  const onMouseUp = (event: any) => {
+    if (event.button !== 1) return; 
+    setIsHoldingWheel(false);
   };
 
   return (
-    <Wrapper>
+    <Wrapper onMouseDown={ onMouseDown } onMouseUp={ onMouseUp }>
       <SideBar />
-      <TransformWrapper {...transformWrapperProps } >
-        <PageWrapper ref={ pageWrapperRef } >
+      <TransformWrapper {...transformWrapperProps }>
+        <PageWrapper>
           <TransformComponent>
-            <Page ref={ pageRef } />
+            <Page scale={ scale } />
           </TransformComponent>
         </PageWrapper>
       </TransformWrapper>

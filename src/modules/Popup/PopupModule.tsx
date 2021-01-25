@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode, useState, useMemo, useContext } from 'react';
-import Popup from '../../components/Popup/Popup';
+import Popup from '../../components/Popup';
 
 interface State {
   isOpen: boolean;
