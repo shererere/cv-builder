@@ -67,7 +67,7 @@ const Page: React.FC<IPage> = (props) => {
 
   const updateSize = (id: any, newSize: any) => {
     setElements((draft) => {
-
+      // todo
     });
   };
 

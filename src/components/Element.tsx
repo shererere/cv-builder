@@ -9,12 +9,15 @@ const StyledElement = styled.div`
   background: ${(props: IElement) => props.background};
 `;
 
-interface IElement {
-  id: string;
-  width: number;
-  height: number;
+interface IEntity {
   x: number;
   y: number;
+  width: number;
+  height: number;
+}
+
+interface IElement extends IEntity {
+  id: string;
   isSelected: boolean;
   background: string;
   updatePosition: Function;
