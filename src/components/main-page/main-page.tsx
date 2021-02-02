@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import SideBar from './SideBar';
-import Page from './Page';
+import { SideBar } from '@components/side-bar';
+import { Page } from '@components/page';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import theme from '../styles/theme'; 
+import theme from '@styles/theme'; 
 
 const Wrapper = styled.div`
   display: flex;
@@ -27,7 +27,7 @@ PageWrapper.defaultProps = {
   theme,
 };
 
-const MainPage = () => {
+export const MainPage = () => {
   const [scale, setScale] = useState(0.75);
   const [isHoldingWheel, setIsHoldingWheel] = useState(false);
 
@@ -74,5 +74,3 @@ const MainPage = () => {
     </Wrapper>
   );
 };
-
-export default MainPage;

@@ -6,7 +6,7 @@ interface PopupProps {
   children: ReactNode;
 }
 
-const Popup = (props: PopupProps) => {
+export const Popup = (props: PopupProps) => {
   const { title, close, children } = props;
   return (
     <div>
@@ -16,5 +16,3 @@ const Popup = (props: PopupProps) => {
     </div>
   );
 };
-
-export default Popup;

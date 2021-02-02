@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import theme from '../styles/theme';
-import Button from './Button';
-import { usePopup } from '../modules/Popup/PopupModule';
+import theme from '@styles/theme';
+import { Button } from '@components/button';
+import { usePopup } from '../../modules/Popup/PopupModule';
 
 const Wrapper = styled.div`
   align-self: stretch;
@@ -15,7 +15,7 @@ Wrapper.defaultProps = {
   theme,
 }
 
-const SideBar = () => {
+export const SideBar = () => {
   const { open } = usePopup();
 
   return (
@@ -25,5 +25,3 @@ const SideBar = () => {
     </Wrapper>
   );
 };
-
-export default SideBar;

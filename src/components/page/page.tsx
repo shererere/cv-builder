@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import { useImmer } from 'use-immer';
-import Element from './Element';
-import theme from '../styles/theme';
+import { Element } from '@components/element';
+import theme from '@styles/theme';
 
 const Wrapper = styled.div`
   position: relative;
@@ -54,7 +54,7 @@ interface IPage {
   scale: number;
 };
 
-const Page: React.FC<IPage> = (props) => {
+export const Page: React.FC<IPage> = (props) => {
   const { scale } = props;
   const [elements, setElements] = useImmer(mock);
 
@@ -84,5 +84,3 @@ const Page: React.FC<IPage> = (props) => {
     </Wrapper>
   );
 };
-
-export default Page;

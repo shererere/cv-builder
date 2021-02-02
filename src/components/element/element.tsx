@@ -24,7 +24,7 @@ interface IElement extends IEntity {
   scale: number;
 }
 
-const Element: React.FC<IElement> = (props) => {
+export const Element: React.FC<IElement> = (props) => {
   const { id, x, y, updatePosition, scale } = props;
 
   const draggableProps = {

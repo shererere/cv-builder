@@ -1,8 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import MainPage from './MainPage';
+import { MainPage } from '@components/main-page';
 
-const App = () => (
+export const App = () => (
   <>
     <Helmet>
       <title>CV Builder</title>
@@ -11,5 +11,3 @@ const App = () => (
     <MainPage />
   </>
 );
-
-export default App;
