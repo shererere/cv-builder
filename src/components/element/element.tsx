@@ -40,8 +40,8 @@ export const Element: React.FC<IElement> = (props) => {
   };
 
   return (
-    <Draggable { ...draggableProps } >
-      <StyledElement { ...props } />
+    <Draggable {...draggableProps} >
+      <StyledElement {...props} />
     </Draggable>
   );
 };

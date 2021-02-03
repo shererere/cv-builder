@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { SideBar } from '@components/side-bar';
 import { Page } from '@components/page';
+import { MouseKey } from '@types';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import theme from '@styles/theme'; 
+import theme from '@styles/theme';
+import { useMousePress } from '@hooks/use-mouse-press';
 
 const Wrapper = styled.div`
   display: flex;
@@ -14,7 +16,7 @@ const Wrapper = styled.div`
     width: 100%;
   }
 `;
-  
+
 const PageWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -29,7 +31,7 @@ PageWrapper.defaultProps = {
 
 export const MainPage = () => {
   const [scale, setScale] = useState(0.75);
-  const [isHoldingWheel, setIsHoldingWheel] = useState(false);
+  const { isPressed } = useMousePress(MouseKey.Middle);
 
   const transformWrapperProps = {
     defaultPositionX: 100,
@@ -44,30 +46,20 @@ export const MainPage = () => {
       disabled: true,
     },
     pan: {
-      disabled: !isHoldingWheel,
+      disabled: !isPressed,
     },
     onZoomChange: (data: any) => {
       setScale(data.scale);
     },
   };
 
-  const onMouseDown = (event: any) => {
-    if (event.button !== 1) return; 
-    setIsHoldingWheel(true);
-  };
-  
-  const onMouseUp = (event: any) => {
-    if (event.button !== 1) return; 
-    setIsHoldingWheel(false);
-  };
-
   return (
-    <Wrapper onMouseDown={ onMouseDown } onMouseUp={ onMouseUp }>
+    <Wrapper>
       <SideBar />
-      <TransformWrapper {...transformWrapperProps }>
+      <TransformWrapper {...transformWrapperProps}>
         <PageWrapper>
           <TransformComponent>
-            <Page scale={ scale } />
+            <Page scale={scale} />
           </TransformComponent>
         </PageWrapper>
       </TransformWrapper>
