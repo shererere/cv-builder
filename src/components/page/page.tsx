@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import { useImmer } from 'use-immer';
 import { Element } from '@components/element';
+import { Selection } from '@components/selection';
 import theme from '@styles/theme';
+import { createPortal } from 'react-dom';
 
 const Wrapper = styled.div`
   position: relative;
@@ -52,11 +54,13 @@ const mock = {
 
 interface IPage {
   scale: number;
+  selectionWrapperRef: RefObject<HTMLElement>;
 };
 
 export const Page: React.FC<IPage> = (props) => {
-  const { scale } = props;
+  const { scale, selectionWrapperRef } = props;
   const [elements, setElements] = useImmer(mock);
+  const [selectedElements, setSelectedElements] = useImmer([]);
 
   const updatePosition = (id: any, newPosition: any) => {
     setElements((draft) => {
@@ -72,15 +76,21 @@ export const Page: React.FC<IPage> = (props) => {
   };
 
   return (
-    <Wrapper>
-      { Object.values(elements).map((item) => (
-        <Element
-          key={ item.id }
-          updatePosition={ updatePosition }
-          scale={ scale }
-          { ...item } 
-        />
-      )) }
-    </Wrapper>
+    <>
+      <Wrapper>
+        {Object.values(elements).map((item) => (
+          <Element
+            key={item.id}
+            updatePosition={updatePosition}
+            scale={scale}
+            {...item}
+          />
+        ))}
+      </Wrapper>
+      {selectionWrapperRef.current && createPortal(
+        <Selection />,
+        selectionWrapperRef.current as Element
+      )}
+    </>
   );
 };

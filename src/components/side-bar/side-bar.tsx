@@ -9,6 +9,7 @@ const Wrapper = styled.div`
   width: 20vw;
   padding: 25px;
   background: ${theme.sidebar};
+  z-index: 9999;
 `;
 
 Wrapper.defaultProps = {
@@ -20,8 +21,8 @@ export const SideBar = () => {
 
   return (
     <Wrapper>
-      <label>Layout</label><br/>
-      <Button onClick={ () => open('popup', <>xd</>) } >Choose</Button>
+      <label>Layout</label><br />
+      <Button onClick={() => open('popup', <>xd</>)} >Choose</Button>
     </Wrapper>
   );
 };

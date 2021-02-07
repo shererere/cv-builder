@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { SideBar } from '@components/side-bar';
 import { Page } from '@components/page';
@@ -6,6 +6,7 @@ import { MouseKey } from '@types';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import theme from '@styles/theme';
 import { useMousePress } from '@hooks/use-mouse-press';
+import { Selection } from '@components/selection';
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,6 +33,7 @@ PageWrapper.defaultProps = {
 export const MainPage = () => {
   const [scale, setScale] = useState(0.75);
   const { isPressed } = useMousePress(MouseKey.Middle);
+  const selectionWrapperRef = useRef(null);
 
   const transformWrapperProps = {
     defaultPositionX: 100,
@@ -59,10 +61,11 @@ export const MainPage = () => {
       <TransformWrapper {...transformWrapperProps}>
         <PageWrapper>
           <TransformComponent>
-            <Page scale={scale} />
+            <Page scale={scale} selectionWrapperRef={selectionWrapperRef} />
           </TransformComponent>
         </PageWrapper>
       </TransformWrapper>
+      <div ref={selectionWrapperRef} />
     </Wrapper>
   );
 };
