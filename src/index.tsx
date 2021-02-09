@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { App } from '@components/app';
 import reportWebVitals from './reportWebVitals';
 import './styles/global.css';
-import { PopupModule } from './modules/Popup/PopupModule';
+import { PopupModule } from './modules/popup';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,4 +18,3 @@ ReactDOM.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
- 

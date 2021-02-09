@@ -11,7 +11,7 @@ interface Actions {
   open: (title: string, content: ReactNode) => void;
 }
 
-interface PopupModuleProps {
+interface IPopupModule {
   children: ReactNode;
 }
 
@@ -20,14 +20,14 @@ const PopupContext = createContext<{
   actions: Actions;
 } | null>(null);
 
-export const PopupModule = (props: PopupModuleProps) => {
-  const { children } = props;
+const defaultState = ({
+  title: '',
+  isOpen: false,
+  content: null,
+});
 
-  const defaultState = useMemo<State>(() => ({
-    title: '',
-    isOpen: false,
-    content: null,
-  }), []);
+export const PopupModule = (props: IPopupModule) => {
+  const { children } = props;
 
   const [state, setState] = useState<State>(defaultState);
 
@@ -45,14 +45,14 @@ export const PopupModule = (props: PopupModuleProps) => {
     <>
       { state.isOpen && (
         <Popup
-          close={ () => setState(defaultState) }
-          title={ state.title }
+          close={() => setState(defaultState)}
+          title={state.title}
         >
-          { state.content }
+          { state.content}
         </Popup>
-      ) }
-      <PopupContext.Provider value={ { state, actions } }>
-        { children }
+      )}
+      <PopupContext.Provider value={{ state, actions }}>
+        {children}
       </PopupContext.Provider>
     </>
   )

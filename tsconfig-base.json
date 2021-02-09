@@ -11,6 +11,9 @@
       "@hooks/*": [
         "src/hooks/*"
       ],
+      "@modules/*": [
+        "src/modules/*"
+      ],
       "@types": [
         "src/types"
       ]

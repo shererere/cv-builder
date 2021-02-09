@@ -1,23 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useMousePress } from '@hooks/use-mouse-press';
 import { TPosition, MouseKey, TSize } from '@types';
-import { start } from 'repl';
 
 interface Wrapper {
   position: TPosition;
   size: TSize;
+  active: boolean;
 }
 
-const Wrapper = styled.div<Wrapper>`
+const Wrapper = styled.div.attrs<Wrapper>((props) => ({
+  style: {
+    top: `${props.position.y}px`,
+    left: `${props.position.x}px`,
+    width: `${props.size.width}px`,
+    height: `${props.size.height}px`,
+  },
+})) <Wrapper>`
   position: fixed;
-  background: #74b9ff;
-  border: 1px solid #0984e3;
+  background: ${props => props.active ? '#74b9ff' : 'transparent'};
+  border: ${props => props.active ? '1px solid #0984e3' : '1px dashed #0984e3'};
   opacity: 0.5;
-  top: ${props => props.position.y}px;
-  left: ${props => props.position.x}px;
-  width: ${props => props.size.width}px;
-  height: ${props => props.size.height}px;
 `;
 
 interface ISelection {
@@ -39,12 +42,15 @@ const getBounds = (startPosition: TPosition, endPosition: TPosition) => {
 export const Selection: React.FC<ISelection> = () => {
   const [startPosition, setStartPosition] = useState<TPosition>({ x: 0, y: 0 });
   const [endPosition, setEndPosition] = useState<TPosition>({ x: 0, y: 0 });
+  const [selecting, setSelecting] = useState(false);
 
   const onHold = (event: MouseEvent) => {
+    setSelecting(true);
     setStartPosition({ x: event.clientX, y: event.clientY });
   };
 
   const onRelease = (event: MouseEvent) => {
+    setSelecting(false);
   };
 
   const onMove = (event: MouseEvent) => {
@@ -58,6 +64,6 @@ export const Selection: React.FC<ISelection> = () => {
   const { position, size } = getBounds(startPosition, endPosition);
 
   return (
-    <Wrapper position={position} size={size} />
+    <Wrapper position={position} size={size} active={selecting} />
   );
 };

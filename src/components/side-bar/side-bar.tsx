@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import theme from '@styles/theme';
 import { Button } from '@components/button';
-import { usePopup } from '../../modules/Popup/PopupModule';
+import { usePopup } from '@modules/popup';
 
 const Wrapper = styled.div`
   align-self: stretch;

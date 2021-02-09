@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Draggable from 'react-draggable';
+import { IElement } from '@types';
 
 const StyledElement = styled.div`
   position: absolute;
@@ -8,21 +9,6 @@ const StyledElement = styled.div`
   height: ${(props: IElement) => props.height}px;
   background: ${(props: IElement) => props.background};
 `;
-
-interface IEntity {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-interface IElement extends IEntity {
-  id: string;
-  isSelected: boolean;
-  background: string;
-  updatePosition: Function;
-  scale: number;
-}
 
 export const Element: React.FC<IElement> = (props) => {
   const { id, x, y, updatePosition, scale } = props;

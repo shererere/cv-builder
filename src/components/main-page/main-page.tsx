@@ -6,7 +6,6 @@ import { MouseKey } from '@types';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import theme from '@styles/theme';
 import { useMousePress } from '@hooks/use-mouse-press';
-import { Selection } from '@components/selection';
 
 const Wrapper = styled.div`
   display: flex;

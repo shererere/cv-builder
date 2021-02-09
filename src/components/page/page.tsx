@@ -60,7 +60,6 @@ interface IPage {
 export const Page: React.FC<IPage> = (props) => {
   const { scale, selectionWrapperRef } = props;
   const [elements, setElements] = useImmer(mock);
-  const [selectedElements, setSelectedElements] = useImmer([]);
 
   const updatePosition = (id: any, newPosition: any) => {
     setElements((draft) => {
