@@ -6,6 +6,7 @@ import { MouseKey } from '@types';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import theme from '@styles/theme';
 import { useMousePress } from '@hooks/use-mouse-press';
+import { useElements } from '@modules/elements';
 
 const Wrapper = styled.div`
   display: flex;
@@ -30,7 +31,7 @@ PageWrapper.defaultProps = {
 };
 
 export const MainPage = () => {
-  const [scale, setScale] = useState(0.75);
+  const { actions, scale } = useElements();
   const { isPressed } = useMousePress(MouseKey.Middle);
   const selectionWrapperRef = useRef(null);
 
@@ -50,7 +51,7 @@ export const MainPage = () => {
       disabled: !isPressed,
     },
     onZoomChange: (data: any) => {
-      setScale(data.scale);
+      actions.setScale(data.scale);
     },
   };
 
@@ -60,7 +61,7 @@ export const MainPage = () => {
       <TransformWrapper {...transformWrapperProps}>
         <PageWrapper>
           <TransformComponent>
-            <Page scale={scale} selectionWrapperRef={selectionWrapperRef} />
+            <Page selectionWrapperRef={selectionWrapperRef} />
           </TransformComponent>
         </PageWrapper>
       </TransformWrapper>

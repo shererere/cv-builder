@@ -30,7 +30,7 @@ export const useMousePress = (
     if (onMove) onMove(event);
   };
 
-  const throttledMoveHandler = throttle(10, moveHandler);
+  const throttledMoveHandler = throttle(30, moveHandler);
 
   useEffect(() => {
     document.addEventListener('mousedown', downHandler);

@@ -4,12 +4,15 @@ import { App } from '@components/app';
 import reportWebVitals from './reportWebVitals';
 import './styles/global.css';
 import { PopupModule } from './modules/popup';
+import { ElementsModule } from '@modules/elements';
 
 ReactDOM.render(
   <React.StrictMode>
-    <PopupModule>
-      <App />
-    </PopupModule>
+    <ElementsModule>
+      <PopupModule>
+        <App />
+      </PopupModule>
+    </ElementsModule>
   </React.StrictMode>,
   document.getElementById('root')
 );

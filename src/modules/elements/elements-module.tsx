@@ -1,17 +1,55 @@
-import React, { createContext, ReactNode, useState, useMemo, useContext } from 'react';
-import { Popup } from '@components/popup';
-import { IElement, TPosition, TSize } from '@types';
+import React, { createContext, ReactNode, useMemo, useContext } from 'react';
+import { IElement } from '@types';
+import { useImmer } from 'use-immer';
+import { v4 as uuidv4 } from 'uuid';
+
+const uuid = uuidv4();
+const uuid2 = uuidv4();
+const uuid3 = uuidv4();
 
 interface State {
-  elements: IElement[];
-  selected: string[];
+  elements: {
+    [key: string]: IElement;
+  };
+  scale: number;
+}
+
+const mock = {
+  [uuid]: {
+    id: uuid,
+    x: 50,
+    y: 50,
+    width: 300,
+    height: 300,
+    background: 'red',
+    isSelected: true,
+  },
+  [uuid2]: {
+    id: uuid2,
+    x: 50,
+    y: 50,
+    width: 300,
+    height: 300,
+    background: 'green',
+    isSelected: false,
+  },
+  [uuid3]: {
+    id: uuid3,
+    x: 50,
+    y: 50,
+    width: 300,
+    height: 300,
+    background: 'yellow',
+    isSelected: false,
+  },
 }
 
 interface Actions {
-  dispatchOnSelected: (fn: Function) => void;
-  updateSize: (id: string, payload: TSize) => void;
-  updatePosition: (id: string, payload: TPosition) => void;
+  dispatch: (fn: Function) => (...args: any) => void;
   select: (id: string) => void;
+  deselect: (id: string) => void;
+  clearSelection: () => void;
+  setScale: (scale: number) => void;
 }
 
 interface IElementsModule {
@@ -23,30 +61,44 @@ const ElementsContext = createContext<{
   actions: Actions;
 } | null>(null);
 
-const defaultState = {
-  elements: [],
-  selected: [],
-};
-
 export const ElementsModule = (props: IElementsModule) => {
   const { children } = props;
 
-  const [state, setState] = useState<State>(defaultState);
+  const [state, setState] = useImmer<State>({ scale: 0.75, elements: mock });
 
   const actions = useMemo<Actions>(() => ({
-    dispatchOnSelected: () => {
-
+    dispatch: (func) => (...args) => {
+      setState((state) => {
+        state.elements = Object.entries(state.elements)
+          .reduce((acc, [key, value]) => ({
+            ...acc,
+            [key]: value.isSelected
+              ? func(state.elements, value, ...args)
+              : value,
+          }), {});
+      });
     },
-    updateSize: (id: string, payload: TSize) => {
-      const element = state.elements.find(e => e.id === id);
-
-      if (!element) return;
-
-      element.width = payload.width;
-      element.height = payload.height;
+    select: (id) => {
+      setState((state) => {
+        state.elements[id].isSelected = true;
+      });
     },
-    updatePosition: () => { },
-    select: () => { },
+    deselect: (id) => {
+      setState((state) => {
+        state.elements[id].isSelected = false;
+      });
+    },
+    clearSelection: () => {
+      setState((state) => {
+        state.elements = Object.entries(state.elements)
+          .reduce((acc, [key, value]) => ({ ...acc, [key]: { ...value, isSelected: false } }), {});
+      });
+    },
+    setScale: (scale) => {
+      setState((state) => {
+        state.scale = scale;
+      })
+    },
   }), []);
 
   return (
@@ -54,4 +106,14 @@ export const ElementsModule = (props: IElementsModule) => {
       {children}
     </ElementsContext.Provider>
   )
+};
+
+export const useElements = () => {
+  const context = useContext(ElementsContext);
+
+  if (!context) {
+    throw new Error('PopupContext is not set');
+  }
+
+  return { actions: context.actions, elements: context.state.elements, scale: context.state.scale };
 };
