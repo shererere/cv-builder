@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React, { RefObject, useRef } from 'react';
 import styled from 'styled-components';
 
 import { Element } from '@components/element';
@@ -7,40 +7,43 @@ import theme from '@styles/theme';
 import { createPortal } from 'react-dom';
 import { useElements } from '@modules/elements';
 
-const Wrapper = styled.div`
+const Workspace = styled.div`
+  width: 30cm;
+  height: 40cm;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
+`;
+
+const WhitePage = styled.div`
   width: 21cm;
   height: 29.7cm;
   background: #fff;
 `;
 
-Wrapper.defaultProps = {
+WhitePage.defaultProps = {
   theme,
 };
 
 interface PageProps {
-  selectionWrapperRef: RefObject<HTMLElement>;
 };
 
 export const Page: React.FC<PageProps> = (props) => {
-  const { selectionWrapperRef } = props;
   const { elements, actions, scale } = useElements();
+  const workspaceRef = useRef(null);
 
   return (
-    <>
-      <Wrapper>
-        {Object.values(elements).map((item) => (
-          <Element
-            scale={scale}
-            key={item.id}
-            {...item}
-          />
-        ))}
-      </Wrapper>
-      {selectionWrapperRef.current && createPortal(
-        <Selection />,
-        selectionWrapperRef.current as Element
-      )}
-    </>
+    <Workspace ref={workspaceRef}>
+      {Object.values(elements).map((item) => (
+        <Element
+          scale={scale}
+          key={item.id}
+          {...item}
+        />
+      ))}
+      <Selection workspaceRef={workspaceRef} />
+      <WhitePage />
+    </Workspace>
   );
 };

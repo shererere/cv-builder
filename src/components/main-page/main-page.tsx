@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { SideBar } from '@components/side-bar';
 import { Page } from '@components/page';
@@ -32,10 +32,9 @@ PageWrapper.defaultProps = {
 
 export const MainPage = () => {
   const { actions, scale } = useElements();
-  const { isPressed } = useMousePress(MouseKey.Middle);
-  const selectionWrapperRef = useRef(null);
+  const { isPressed } = useMousePress({ targetKey: MouseKey.Middle });
 
-  const transformWrapperProps = {
+  const transformWrapperProps = useMemo(() => ({
     defaultPositionX: 100,
     defaultPositionY: 25,
     defaultScale: scale,
@@ -50,10 +49,12 @@ export const MainPage = () => {
     pan: {
       disabled: !isPressed,
     },
-    onZoomChange: (data: any) => {
-      actions.setScale(data.scale);
+    onZoomChange: ({ scale: newScale }: any) => {
+      if (newScale !== scale) {
+        actions.setScale(newScale);
+      }
     },
-  };
+  }), [scale, isPressed]);
 
   return (
     <Wrapper>
@@ -61,11 +62,10 @@ export const MainPage = () => {
       <TransformWrapper {...transformWrapperProps}>
         <PageWrapper>
           <TransformComponent>
-            <Page selectionWrapperRef={selectionWrapperRef} />
+            <Page />
           </TransformComponent>
         </PageWrapper>
       </TransformWrapper>
-      <div ref={selectionWrapperRef} />
     </Wrapper>
   );
 };

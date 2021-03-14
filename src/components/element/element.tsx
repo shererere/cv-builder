@@ -10,6 +10,10 @@ const StyledElement = styled.div`
   width: ${(props: IElement) => props.width}px;
   height: ${(props: IElement) => props.height}px;
   background: ${(props: IElement) => props.background};
+  left: 0;
+  top: 0;
+  will-change: transform;
+  transform: translateZ(0);
 `;
 
 interface ElementProps extends IElement {
@@ -18,23 +22,20 @@ interface ElementProps extends IElement {
 
 export const Element: React.FC<ElementProps> = (props) => {
   const { id, x, y, scale } = props;
-  const { actions } = useElements();
+  const { actions, elements } = useElements();
 
   const draggableProps = {
     bounds: 'parent',
     position: { x, y },
     scale,
-    onStart: () => {
-      actions.clearSelection();
-      actions.select(id);
-    },
     onDrag: (e: any, data: any) => {
       actions.dispatch(updatePosition)({
-        x: x + data.deltaX,
-        y: y + data.deltaY,
+        x: data.deltaX,
+        y: data.deltaY,
       });
     },
   };
+
 
   return (
     <Draggable {...draggableProps} >
