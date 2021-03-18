@@ -10,6 +10,7 @@ const StyledElement = styled.div`
   width: ${(props: IElement) => props.width}px;
   height: ${(props: IElement) => props.height}px;
   background: ${(props: IElement) => props.background};
+  z-index: ${(props: IElement) => props.layer};
   left: 0;
   top: 0;
   will-change: transform;
@@ -21,7 +22,7 @@ interface ElementProps extends IElement {
 }
 
 export const Element: React.FC<ElementProps> = (props) => {
-  const { id, x, y, scale } = props;
+  const { id, isSelected, x, y, scale } = props;
   const { actions, elements } = useElements();
 
   const draggableProps = {

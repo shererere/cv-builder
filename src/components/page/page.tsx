@@ -6,6 +6,7 @@ import { Selection } from '@components/selection';
 import theme from '@styles/theme';
 import { createPortal } from 'react-dom';
 import { useElements } from '@modules/elements';
+import { IElement } from '@types';
 
 const Workspace = styled.div`
   width: 30cm;
@@ -29,13 +30,15 @@ WhitePage.defaultProps = {
 interface PageProps {
 };
 
+const sortByLayer = (elA: IElement, elB: IElement) => (elB.layer - elA.layer);
+
 export const Page: React.FC<PageProps> = (props) => {
   const { elements, actions, scale } = useElements();
   const workspaceRef = useRef(null);
 
   return (
     <Workspace ref={workspaceRef}>
-      {Object.values(elements).map((item) => (
+      {Object.values(elements).sort(sortByLayer).map((item) => (
         <Element
           scale={scale}
           key={item.id}

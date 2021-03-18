@@ -22,7 +22,7 @@ const mock = {
     height: 300,
     background: 'red',
     isSelected: false,
-    layer: 1,
+    layer: 3,
   },
   [uuid2]: {
     id: uuid2,
@@ -32,7 +32,7 @@ const mock = {
     height: 300,
     background: 'green',
     isSelected: false,
-    layer: 1,
+    layer: 2,
   },
   // [uuid3]: {
   //   id: uuid3,

@@ -1,8 +1,9 @@
-import React, { RefObject, useEffect, useState, useMemo } from 'react';
+import React, { RefObject, useEffect, useState, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { useMousePress } from '@hooks/use-mouse-press';
 import { TPosition, MouseKey, TSize, IElement, IEntity } from '@types';
 import { useElements } from '@modules/elements';
+import { start } from 'repl';
 
 interface Wrapper extends TPosition, TSize {
   active: boolean;
@@ -70,66 +71,61 @@ const contains = (wrapper: IEntity, element: IEntity) => (
   element.y + element.height <= wrapper.y + wrapper.height
 );
 
-const shouldStartSelecting = (position: TPosition, elements: IElement[]) => {
-  const clickedEl = elements.find(el => contains(el, { ...position, width: 1, height: 1 }));
-  return !!clickedEl;
-};
+const sortByLayer = (elA: IElement, elB: IElement) => (elB.layer - elA.layer);
 
 export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
   const [startPosition, setStartPosition] = useState<TPosition>({ x: 0, y: 0 });
   const [endPosition, setEndPosition] = useState<TPosition>({ x: 0, y: 0 });
-  const [state, setState] = useState(SelectionState.None);
   const { actions, elements } = useElements();
 
   const selectedElements = useMemo(() => Object.values(elements).filter(el => el.isSelected), [elements]);
 
-  const selectionElement = state === SelectionState.Selecting
-    ? getBounds(startPosition, endPosition)
-    : getBounds2(selectedElements);
+  const selectionElement = getBounds(startPosition, endPosition);
 
-  const onHold = () => {
-    setState(SelectionState.Selecting);
-  };
-
-  const onMove = () => {
-  };
-
-  const onRelease = () => {
-    setState(SelectionState.Released);
-  };
-
-  const { position } = useMousePress({
-    targetKey: MouseKey.Left, onHold, onRelease, onMove
+  const { position, isPressed } = useMousePress({
+    targetKey: MouseKey.Left
   });
 
   useEffect(() => {
     if (!workspaceRef.current) return;
 
-    const newPosition = getNormalizedPosition(position, workspaceRef.current);
+    const newPos = getNormalizedPosition(position, workspaceRef.current);
 
-    if (state === SelectionState.Selecting) {
-      setEndPosition(newPosition);
+    if (!isPressed) {
+      setStartPosition(newPos);
     }
 
-    if (state !== SelectionState.Selecting) {
-      setStartPosition(newPosition);
-    }
-  }, [state, position]);
+    setEndPosition(newPos);
+  }, [isPressed, position]);
 
   useEffect(() => {
-    if (state === SelectionState.Released) {
+    if (!isPressed) {
       const selectionContains = (el: IEntity) => contains(selectionElement, el);
+      const wrappedElements = Object.values(elements).sort(sortByLayer).filter(selectionContains);
 
-      Object.values(elements).filter(selectionContains).forEach((el) => {
-        actions.select(el.id);
-        console.log(el.id);
-      });
+      if (wrappedElements.length) {
+        actions.clearSelection();
+        wrappedElements.forEach((el) => {
+          actions.select(el.id);
+        })
+      }
+    } else {
+      const click = { ...startPosition, width: 1, height: 1 };
+      const clicked = (el: IEntity) => contains(el, click);
+      const clickedEl = Object.values(elements).sort(sortByLayer).find(clicked);
 
-      setState(SelectionState.Selected);
+      if (clickedEl && selectedElements.length < 2) {
+        actions.clearSelection();
+        actions.select(clickedEl.id);
+      }
+
+      if (!clickedEl) {
+        actions.clearSelection();
+      }
     }
-  }, [state, selectionElement]);
+  }, [isPressed]);
 
   return (
-    <Wrapper {...selectionElement} active={state === SelectionState.Selecting} />
+    <Wrapper {...selectionElement} active={true} />
   );
 };
