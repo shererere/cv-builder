@@ -7,6 +7,7 @@ import { start } from 'repl';
 
 interface Wrapper extends TPosition, TSize {
   active: boolean;
+  scale: number;
 }
 
 const Wrapper = styled.div.attrs<Wrapper>((props) => ({
@@ -55,12 +56,12 @@ const getBounds2 = (selectedElements: IElement[]) => {
   return { x, y, width, height };
 };
 
-const getNormalizedPosition = (position: TPosition, wrapper: HTMLElement) => {
+const getNormalizedPosition = (position: TPosition, wrapper: HTMLElement, scale: number) => {
   const wrapperBounds = wrapper.getBoundingClientRect();
   const yOffset = window.outerHeight - window.innerHeight;
   return {
-    x: position.x - wrapperBounds.left,
-    y: position.y - wrapperBounds.top - yOffset,
+    x: (position.x - wrapperBounds.left) / scale,
+    y: (position.y - wrapperBounds.top - yOffset) / scale,
   };
 };
 
@@ -76,11 +77,13 @@ const sortByLayer = (elA: IElement, elB: IElement) => (elB.layer - elA.layer);
 export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
   const [startPosition, setStartPosition] = useState<TPosition>({ x: 0, y: 0 });
   const [endPosition, setEndPosition] = useState<TPosition>({ x: 0, y: 0 });
-  const { actions, elements } = useElements();
+  const { actions, elements, scale } = useElements();
 
   const selectedElements = useMemo(() => Object.values(elements).filter(el => el.isSelected), [elements]);
 
-  const selectionElement = getBounds(startPosition, endPosition);
+  const selectionElement = selectedElements.length
+    ? getBounds2(selectedElements)
+    : getBounds(startPosition, endPosition);
 
   const { position, isPressed } = useMousePress({
     targetKey: MouseKey.Left
@@ -89,7 +92,7 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
   useEffect(() => {
     if (!workspaceRef.current) return;
 
-    const newPos = getNormalizedPosition(position, workspaceRef.current);
+    const newPos = getNormalizedPosition(position, workspaceRef.current, scale);
 
     if (!isPressed) {
       setStartPosition(newPos);
@@ -103,7 +106,7 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
       const selectionContains = (el: IEntity) => contains(selectionElement, el);
       const wrappedElements = Object.values(elements).sort(sortByLayer).filter(selectionContains);
 
-      if (wrappedElements.length) {
+      if (wrappedElements.length && !selectedElements.length) {
         actions.clearSelection();
         wrappedElements.forEach((el) => {
           actions.select(el.id);
@@ -114,7 +117,7 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
       const clicked = (el: IEntity) => contains(el, click);
       const clickedEl = Object.values(elements).sort(sortByLayer).find(clicked);
 
-      if (clickedEl && selectedElements.length < 2) {
+      if (clickedEl && !clickedEl.isSelected && selectedElements.length < 2) {
         actions.clearSelection();
         actions.select(clickedEl.id);
       }
@@ -126,6 +129,6 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
   }, [isPressed]);
 
   return (
-    <Wrapper {...selectionElement} active={true} />
+    <Wrapper {...selectionElement} active={true} scale={scale} />
   );
 };
