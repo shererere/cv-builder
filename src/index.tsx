@@ -5,14 +5,17 @@ import reportWebVitals from './reportWebVitals';
 import './styles/global.css';
 import { PopupModule } from './modules/popup';
 import { ElementsModule } from '@modules/elements';
+import { ScaleModule } from '@modules/scale';
 
 ReactDOM.render(
   <React.StrictMode>
-    <ElementsModule>
-      <PopupModule>
-        <App />
-      </PopupModule>
-    </ElementsModule>
+    <ScaleModule>
+      <ElementsModule>
+        <PopupModule>
+          <App />
+        </PopupModule>
+      </ElementsModule>
+    </ScaleModule>
   </React.StrictMode>,
   document.getElementById('root')
 );

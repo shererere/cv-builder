@@ -7,6 +7,7 @@ import theme from '@styles/theme';
 import { createPortal } from 'react-dom';
 import { useElements } from '@modules/elements';
 import { IElement } from '@types';
+import { useScale } from '@modules/scale';
 
 const Workspace = styled.div`
   width: 30cm;
@@ -33,7 +34,8 @@ interface PageProps {
 const sortByLayer = (elA: IElement, elB: IElement) => (elB.layer - elA.layer);
 
 export const Page: React.FC<PageProps> = (props) => {
-  const { elements, actions, scale } = useElements();
+  const { elements } = useElements();
+  const { scale } = useScale();
   const workspaceRef = useRef(null);
 
   return (

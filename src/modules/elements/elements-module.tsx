@@ -7,10 +7,7 @@ const uuid2 = uuidv4();
 const uuid3 = uuidv4();
 
 interface State {
-  elements: {
-    [key: string]: IElement;
-  };
-  scale: number;
+  [key: string]: IElement;
 }
 
 const mock = {
@@ -51,7 +48,6 @@ interface Actions {
   select: (id: string) => void;
   deselect: (id: string) => void;
   clearSelection: () => void;
-  setScale: (scale: number) => void;
 }
 
 interface IElementsModule {
@@ -66,56 +62,38 @@ const ElementsContext = createContext<{
 export const ElementsModule = (props: IElementsModule) => {
   const { children } = props;
 
-  const [state, setState] = useState<State>({ scale: 1, elements: mock });
+  const [state, setState] = useState<State>(mock);
 
   const actions = useMemo<Actions>(() => ({
     dispatch: (func) => (...args) => {
       setState((oldState) => ({
         ...oldState,
-        elements: {
-          ...oldState.elements,
-          ...Object.entries(oldState.elements)
-            .filter(([key, value]) => value.isSelected)
-            .reduce((acc, [key, value]) => ({ ...acc, [key]: func(state.elements, value, ...args) }), {}),
-        }
+        ...Object.entries(oldState)
+          .filter(([key, value]) => value.isSelected)
+          .reduce((acc, [key, value]) => ({ ...acc, [key]: func(state, value, ...args) }), {}),
       }));
     },
     select: (id) => {
       setState((oldState) => ({
         ...oldState,
-        elements: {
-          ...oldState.elements,
-          [id]: {
-            ...oldState.elements[id],
-            isSelected: true,
-          }
+        [id]: {
+          ...oldState[id],
+          isSelected: true,
         }
       }));
     },
     deselect: (id) => {
       setState((oldState) => ({
         ...oldState,
-        elements: {
-          ...oldState.elements,
-          [id]: {
-            ...oldState.elements[id],
-            isSelected: false,
-          }
+        [id]: {
+          ...oldState[id],
+          isSelected: false,
         }
       }));
     },
     clearSelection: () => {
-      setState((oldState) => ({
-        ...oldState,
-        elements: Object.entries(oldState.elements)
-          .reduce((acc, [key, value]) => ({ ...acc, [key]: { ...value, isSelected: false } }), {})
-      }));
-    },
-    setScale: (scale) => {
-      setState((oldState) => ({
-        ...oldState,
-        scale,
-      }));
+      setState((oldState) => Object.entries(oldState)
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: { ...value, isSelected: false } }), {}));
     },
   }), []);
 
@@ -130,12 +108,15 @@ export const useElements = () => {
   const context = useContext(ElementsContext);
 
   if (!context) {
-    throw new Error('PopupContext is not set');
+    throw new Error('ElementsContext is not set');
   }
 
+  const { actions, state } = context;
+
   return {
-    actions: context.actions,
-    elements: context.state.elements,
-    scale: context.state.scale,
+    actions: actions,
+    elements: Object.values(state),
+    selectedElements: Object.values(state)
+      .filter(element => element.isSelected),
   };
 };

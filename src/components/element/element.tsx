@@ -15,6 +15,8 @@ const StyledElement = styled.div`
   top: 0;
   will-change: transform;
   transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000;
 `;
 
 interface ElementProps extends IElement {
