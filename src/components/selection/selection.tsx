@@ -6,7 +6,7 @@ import { useElements } from '@modules/elements';
 import { useScale } from '@modules/scale';
 import { contains, cartesianProductOfTwoPoints, wrapperForElements } from '@utils';
 import { updatePosition } from '@modules/elements/functions/update-position';
-import Draggable from 'react-draggable';
+import { DraggableCore as Draggable } from 'react-draggable';
 
 interface Wrapper extends TPosition, TSize {
   active: boolean;
@@ -15,6 +15,7 @@ interface Wrapper extends TPosition, TSize {
 
 const Wrapper = styled.div.attrs<Wrapper>((props) => ({
   style: {
+    transform: `translate(${props.x}px, ${props.y}px)`,
     width: `${props.width}px`,
     height: `${props.height}px`,
   },
@@ -106,6 +107,7 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
   const [endPosition, setEndPosition] = useState<TPosition>({ x: 0, y: 0 });
   const [state, setState] = useState<SelectionState>(SelectionState.None);
   const [selectionClickCount, setSelectionClickCount] = useState(0);
+  const [lastClickedId, setLastClickedId] = useState<any>(null);
   const { actions, elements, selectedElements } = useElements();
   const { scale } = useScale();
 
@@ -127,12 +129,36 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
     }
 
     setEndPosition(newPos);
-  }, [isPressed, position]);
+  }, [position]);
 
   useEffect(() => {
-    if (!isPressed) {
-      const selectionContains = (el: IEntity) => contains(selectionElement, el);
-      const wrappedElements = elements.sort(sortByLayer).filter(selectionContains);
+    const click = { ...startPosition, width: 1, height: 1 };
+    const clicked = (el: IEntity) => contains(el, click);
+    const clickedOnSelection = clicked(selectionElement);
+    const selectionContains = (el: IEntity) => contains(selectionElement, el);
+    const wrappedElements = elements.sort(sortByLayer).filter(selectionContains);
+    const clickedElement = elements.sort(sortByLayer).find(clicked);
+
+    if (isPressed) {
+      // on mouse down
+
+      if (clickedElement && !clickedElement.isSelected && selectedElements.length < 2) {
+        actions.clearSelection();
+        actions.select(clickedElement.id);
+        setSelectionClickCount(1);
+        setLastClickedId(clickedElement.id);
+      }
+
+      if (!clickedElement && !clickedOnSelection) {
+        actions.clearSelection();
+        setSelectionClickCount(0);
+      }
+    } else {
+      // on mouse up
+
+      if ((clickedOnSelection || (clickedElement && lastClickedId === clickedElement.id)) && selectionClickCount && startPosition.x === endPosition.x && startPosition.y === startPosition.y) {
+        setSelectionClickCount(oldState => oldState + 1);
+      }
 
       if (wrappedElements.length && !selectedElements.length) {
         actions.clearSelection();
@@ -141,31 +167,14 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
           actions.select(el.id);
         });
       }
-    } else {
-      const click = { ...startPosition, width: 1, height: 1 };
-      const clicked = (el: IEntity) => contains(el, click);
-      const clickedOnSelection = clicked(selectionElement);
-
-      if (clickedOnSelection || !selectionClickCount) {
-        setSelectionClickCount(oldState => oldState + 1);
-      }
-
-      const clickedEl = elements.sort(sortByLayer).find(clicked);
-      if (clickedEl && !clickedEl.isSelected && selectedElements.length < 2) {
-        actions.clearSelection();
-        actions.select(clickedEl.id);
-        setSelectionClickCount(1);
-      }
-
-      if (!clickedEl && !clickedOnSelection) {
-        actions.clearSelection();
-        setSelectionClickCount(0);
-      }
     }
   }, [isPressed]);
 
   useEffect(() => {
     switch (selectionClickCount) {
+      case 0:
+        setState(SelectionState.None);
+        return;
       case 1:
         setState(SelectionState.Move);
         return;
@@ -176,7 +185,6 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
         setState(SelectionState.Rotate);
         return;
       case 4:
-        setState(SelectionState.Move);
         setSelectionClickCount(1);
         return;
     }
@@ -186,8 +194,10 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
     bounds: 'parent',
     position: { x: selectionElement.x, y: selectionElement.y },
     scale,
-    disabled: state === SelectionState.None,
     onDrag: (e: any, data: any) => {
+      if (state !== SelectionState.Move) {
+        return;
+      }
       actions.dispatch(updatePosition)({
         x: data.deltaX,
         y: data.deltaY,
