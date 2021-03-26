@@ -107,6 +107,7 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
   const [endPosition, setEndPosition] = useState<TPosition>({ x: 0, y: 0 });
   const [state, setState] = useState<SelectionState>(SelectionState.None);
   const [selectionClickCount, setSelectionClickCount] = useState(0);
+  const [clickedId, setClickedId] = useState<any>(null);
   const [lastClickedId, setLastClickedId] = useState<any>(null);
   const { actions, elements, selectedElements } = useElements();
   const { scale } = useScale();
@@ -132,21 +133,25 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
   }, [position]);
 
   useEffect(() => {
-    const click = { ...startPosition, width: 1, height: 1 };
-    const clicked = (el: IEntity) => contains(el, click);
+    const clickStart = { ...startPosition, width: 1, height: 1 };
+    const clickEnd = { ...endPosition, width: 1, height: 1 };
+    const clicked = (el: IEntity) => contains(el, clickEnd);
     const clickedOnSelection = clicked(selectionElement);
     const selectionContains = (el: IEntity) => contains(selectionElement, el);
     const wrappedElements = elements.sort(sortByLayer).filter(selectionContains);
     const clickedElement = elements.sort(sortByLayer).find(clicked);
+    const didntMoveCursor = selectionClickCount && startPosition.x === endPosition.x && startPosition.y === startPosition.y;
+    const multipleElementsSelected = selectedElements.length > 1;
+    const clickedSameElement = clickedElement && lastClickedId === clickedElement.id;
 
     if (isPressed) {
       // on mouse down
+      setClickedId(clickedElement?.id);
 
-      if (clickedElement && !clickedElement.isSelected && selectedElements.length < 2) {
+      if (clickedElement && !clickedElement.isSelected && !multipleElementsSelected) {
         actions.clearSelection();
         actions.select(clickedElement.id);
         setSelectionClickCount(1);
-        setLastClickedId(clickedElement.id);
       }
 
       if (!clickedElement && !clickedOnSelection) {
@@ -155,8 +160,11 @@ export const Selection: React.FC<ISelection> = ({ workspaceRef }) => {
       }
     } else {
       // on mouse up
+      if (!selectionContains(clickStart)) {
+        setLastClickedId(clickedElement?.id);
+      }
 
-      if ((clickedOnSelection || (clickedElement && lastClickedId === clickedElement.id)) && selectionClickCount && startPosition.x === endPosition.x && startPosition.y === startPosition.y) {
+      if (((clickedOnSelection && multipleElementsSelected) || clickedSameElement) && didntMoveCursor) {
         setSelectionClickCount(oldState => oldState + 1);
       }
 

@@ -50,6 +50,9 @@ export const MainPage = () => {
     pan: {
       disabled: !isPressed,
     },
+    doubleClick: {
+      disabled: true,
+    },
     onZoomChange: ({ scale: newScale }: any) => {
       if (newScale !== scale) {
         setScale(newScale);
