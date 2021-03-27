@@ -1,15 +1,15 @@
-import React, { RefObject, useRef } from 'react';
+import React, { useRef, MouseEventHandler } from 'react';
 import styled from 'styled-components';
 
 import { Element } from '@components/element';
 import { Selection } from '@components/selection';
 import theme from '@styles/theme';
-import { createPortal } from 'react-dom';
 import { useElements } from '@modules/elements';
 import { IElement } from '@types';
 import { useScale } from '@modules/scale';
+import { useSelection } from '@hooks/use-selection';
 
-const Workspace = styled.div`
+const Wrapper = styled.div`
   width: 30cm;
   height: 40cm;
   display: flex;
@@ -28,18 +28,16 @@ WhitePage.defaultProps = {
   theme,
 };
 
-interface PageProps {
-};
-
 const sortByLayer = (elA: IElement, elB: IElement) => (elB.layer - elA.layer);
 
-export const Page: React.FC<PageProps> = (props) => {
+export const Workspace: React.FC = () => {
   const { elements } = useElements();
   const { scale } = useScale();
   const workspaceRef = useRef(null);
+  const { workspaceProps, selectionProps } = useSelection(workspaceRef);
 
   return (
-    <Workspace ref={workspaceRef}>
+    <Wrapper ref={workspaceRef}  {...workspaceProps}>
       {Object.values(elements).sort(sortByLayer).map((item) => (
         <Element
           scale={scale}
@@ -47,8 +45,8 @@ export const Page: React.FC<PageProps> = (props) => {
           {...item}
         />
       ))}
-      <Selection workspaceRef={workspaceRef} />
       <WhitePage />
-    </Workspace>
+      <Selection {...selectionProps} />
+    </Wrapper>
   );
 };

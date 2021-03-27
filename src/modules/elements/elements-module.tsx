@@ -31,16 +31,16 @@ const mock = {
     isSelected: false,
     layer: 2,
   },
-  // [uuid3]: {
-  //   id: uuid3,
-  //   x: 50,
-  //   y: 50,
-  //   width: 300,
-  //   height: 300,
-  //   background: 'yellow',
-  //   isSelected: false,
-  //   layer: 1,
-  // },
+  [uuid3]: {
+    id: uuid3,
+    x: 100,
+    y: 100,
+    width: 300,
+    height: 300,
+    background: 'yellow',
+    isSelected: false,
+    layer: 1,
+  },
 }
 
 interface Actions {

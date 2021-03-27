@@ -1,50 +1,59 @@
-import React, { MouseEvent } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import Draggable from 'react-draggable';
 import { IElement } from '@types';
 import { useElements } from '@modules/elements';
+import { useScale } from '@modules/scale';
+import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 import { updatePosition } from '@modules/elements/functions/update-position';
-
-const StyledElement = styled.div`
-  position: absolute;
-  width: ${(props: IElement) => props.width}px;
-  height: ${(props: IElement) => props.height}px;
-  background: ${(props: IElement) => props.background};
-  z-index: ${(props: IElement) => props.layer};
-  left: 0;
-  top: 0;
-  will-change: transform;
-  transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  -webkit-perspective: 1000;
-`;
 
 interface ElementProps extends IElement {
   scale: number;
 }
 
-export const Element: React.FC<ElementProps> = (props) => {
-  const { id, isSelected, x, y, scale } = props;
-  const { actions, elements } = useElements();
+const StyledElement = styled.div.attrs((props: ElementProps) => ({
+  style: {
+    width: `${props.width}px`,
+    height: `${props.height}px`,
+    background: `${props.background}`,
+    zIndex: `${props.layer}`,
+    transform: `translate(${props.x}px, ${props.y}px)`,
+  },
+}))`
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
 
-  const draggableProps = {
+export const Element: React.FC<ElementProps> = (props) => {
+  const { actions } = useElements();
+  const { scale } = useScale();
+
+  const styledElementProps = {
+    x: props.x,
+    y: props.y,
+    width: props.width,
+    height: props.height,
+    background: props.background,
+  };
+
+  const draggableCoreProps = {
     bounds: 'parent',
-    position: { x, y },
-    scale,
-    onDrag: (e: any, data: any) => {
+    onDrag: (event: DraggableEvent, data: DraggableData) => {
       actions.dispatch(updatePosition)({
         x: data.deltaX,
         y: data.deltaY,
       });
     },
-  };
-
+    position: { x: props.x, y: props.y },
+    scale,
+  }
 
   return (
-    <Draggable {...draggableProps} >
-      <StyledElement {...props} />
-    </Draggable>
+    <DraggableCore {...draggableCoreProps}>
+      <StyledElement {...styledElementProps}>
+      </StyledElement>
+    </DraggableCore>
   );
-};
+}
 
 export default Element;

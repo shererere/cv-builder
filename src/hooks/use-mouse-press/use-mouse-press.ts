@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, MouseEvent, MouseEventHandler } from 'react';
 import { throttle } from 'throttle-debounce';
-import { MouseEventHandler, MouseKey, TPosition } from '@types';
+import { MouseKey, TPosition } from '@types';
 
 interface UseMousePressProps {
   targetKey: MouseKey,
-  onHold?: MouseEventHandler,
-  onRelease?: MouseEventHandler,
-  onMove?: MouseEventHandler
+  onHold?: (event: MouseEvent, position: TPosition) => void,
+  onRelease?: (event: MouseEvent, position: TPosition) => void,
+  onMove?: (event: MouseEvent, position: TPosition, isPressed: boolean) => void
 }
 
 export const useMousePress = ({
@@ -21,35 +21,29 @@ export const useMousePress = ({
   const downHandler = (event: MouseEvent) => {
     if (event.button === targetKey) {
       setIsPressed(true);
-      if (onHold) onHold(event);
+      if (onHold) onHold(event, position);
     }
   };
 
   const upHandler = (event: MouseEvent) => {
     if (event.button === targetKey) {
       setIsPressed(false);
-      if (onRelease) onRelease(event);
+      if (onRelease) onRelease(event, position);
     }
   };
 
   const moveHandler = (event: MouseEvent) => {
-    setPosition({ x: event.screenX, y: event.screenY });
-    if (onMove) onMove(event);
+    setPosition({ x: event.clientX, y: event.clientY });
+    if (onMove) onMove(event, position, isPressed);
   };
 
-  const throttledMoveHandler = throttle(1, moveHandler);
+  const throttledMoveHandler = throttle(30, moveHandler);
 
-  useEffect(() => {
-    document.addEventListener('mousedown', downHandler);
-    document.addEventListener('mousemove', throttledMoveHandler);
-    document.addEventListener('mouseup', upHandler);
+  const mousePressProps = {
+    onMouseDown: downHandler,
+    onMouseUp: upHandler,
+    onMouseMove: throttledMoveHandler,
+  }
 
-    return () => {
-      document.removeEventListener('mousedown', downHandler);
-      document.removeEventListener('mousemove', throttledMoveHandler);
-      document.removeEventListener('mouseup', upHandler);
-    };
-  }, []);
-
-  return { isPressed, position };
+  return { mousePressProps, isPressed, position };
 }

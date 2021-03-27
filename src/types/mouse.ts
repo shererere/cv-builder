@@ -3,5 +3,3 @@ export enum MouseKey {
   Middle,
   Right
 }
-
-export type MouseEventHandler = (event: MouseEvent) => void;

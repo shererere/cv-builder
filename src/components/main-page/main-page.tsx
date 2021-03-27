@@ -1,13 +1,13 @@
 import React, { useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { SideBar } from '@components/side-bar';
-import { Page } from '@components/page';
 import { MouseKey } from '@types';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import theme from '@styles/theme';
 import { useMousePress } from '@hooks/use-mouse-press';
 import { useElements } from '@modules/elements';
 import { useScale } from '@modules/scale';
+import { Workspace } from '@components/workspace';
 
 const Wrapper = styled.div`
   display: flex;
@@ -33,7 +33,7 @@ PageWrapper.defaultProps = {
 
 export const MainPage = () => {
   const { scale, setScale } = useScale();
-  const { isPressed } = useMousePress({ targetKey: MouseKey.Middle });
+  const { mousePressProps, isPressed } = useMousePress({ targetKey: MouseKey.Middle });
 
   const transformWrapperProps = useMemo(() => ({
     defaultPositionX: 100,
@@ -61,12 +61,12 @@ export const MainPage = () => {
   }), [scale, isPressed]);
 
   return (
-    <Wrapper>
+    <Wrapper {...mousePressProps}>
       <SideBar />
       <TransformWrapper {...transformWrapperProps}>
         <PageWrapper>
           <TransformComponent>
-            <Page />
+            <Workspace />
           </TransformComponent>
         </PageWrapper>
       </TransformWrapper>
