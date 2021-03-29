@@ -1,15 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-import { IEntity } from '@types';
+import { IEntity, SelectionState } from '@types';
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 import { useScale } from '@modules/scale';
 import { useElements } from '@modules/elements';
 import { updatePosition } from '@modules/elements/functions/update-position';
+import { BottomLeftHandle, BottomRightHandle, TopLeftHandle, TopRightHandle } from './handle';
 
 interface SelectionProps extends IEntity {
+  state: SelectionState;
+  active: boolean;
 }
 
 interface WrapperProps extends IEntity {
+  state: SelectionState;
 }
 
 const Wrapper = styled.div.attrs((props: WrapperProps) => ({
@@ -17,6 +21,7 @@ const Wrapper = styled.div.attrs((props: WrapperProps) => ({
     transform: `translate(${props.x}px, ${props.y}px)`,
     width: `${props.width}px`,
     height: `${props.height}px`,
+    border: `1px solid blue`,
   },
 })) <WrapperProps>`
   position: absolute;
@@ -36,57 +41,24 @@ const InnerWrapper = styled.div`
   height: 100%;
 `;
 
-const Handle = styled.div`
-  position: absolute;
-  width: 20px;
-  height: 20px;
-`;
-
-const TopLeftHandle = styled(Handle)`
-  top: -3px;
-  left: -3px;
-  border-top: 3px solid black;
-  border-left: solid 3px black;
-`;
-
-const TopRightHandle = styled(Handle)`
-  top: -3px;
-  right: -3px;
-  border-top: 3px solid black;
-  border-right: solid 3px black;
-`;
-
-const BottomRightHandle = styled(Handle)`
-  bottom: -3px;
-  right: -3px;
-  border-bottom: 3px solid black;
-  border-right: solid 3px black;
-`;
-
-const BottomLeftHandle = styled(Handle)`
-  bottom: -3px;
-  left: -3px;
-  border-bottom: 3px solid black;
-  border-left: solid 3px black;
-`;
-
-const MoveHandle = styled(Handle)`
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border: solid 3px black;
-`;
-
-export const Selection: React.FC<SelectionProps> = (props) => {
+export const Selection: React.FC<SelectionProps> = ({
+  active,
+  height,
+  width,
+  state,
+  x,
+  y,
+}) => {
   const { actions } = useElements();
   const { scale } = useScale();
 
   const wrapperProps = {
-    x: props.x,
-    y: props.y,
-    width: props.width,
-    height: props.height,
+    x,
+    y,
+    width,
+    height,
     scale,
+    state,
   };
 
   const draggableCoreProps = {
@@ -97,14 +69,38 @@ export const Selection: React.FC<SelectionProps> = (props) => {
         y: data.deltaY,
       });
     },
-    position: { x: props.x, y: props.y },
+    position: { x, y },
     scale,
+  };
+
+  if (!active) {
+    return null;
   }
 
-  return (
-    <DraggableCore {...draggableCoreProps}>
-      <Wrapper {...wrapperProps}>
-      </Wrapper>
-    </DraggableCore>
-  );
+  switch (state) {
+    case SelectionState.Move:
+      return (
+        <DraggableCore {...draggableCoreProps}>
+          <Wrapper {...wrapperProps}>
+          </Wrapper>
+        </DraggableCore>
+      );
+
+    case SelectionState.Resize:
+      return (
+        <Wrapper {...wrapperProps}>
+          <InnerWrapper>
+            <TopLeftHandle />
+            <TopRightHandle />
+            <BottomLeftHandle />
+            <BottomRightHandle />
+          </InnerWrapper>
+        </Wrapper>
+      );
+
+    default:
+      return (
+        <Wrapper {...wrapperProps} />
+      );
+  }
 }

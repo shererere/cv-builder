@@ -64,8 +64,8 @@ export const ElementsModule = (props: IElementsModule) => {
 
   const [state, setState] = useState<State>(mock);
 
-  const actions = useMemo<Actions>(() => ({
-    dispatch: (func) => (...args) => {
+  const actions = {
+    dispatch: (func: any) => (...args: any) => {
       setState((oldState) => ({
         ...oldState,
         ...Object.entries(oldState)
@@ -73,7 +73,7 @@ export const ElementsModule = (props: IElementsModule) => {
           .reduce((acc, [key, value]) => ({ ...acc, [key]: func(state, value, ...args) }), {}),
       }));
     },
-    select: (id) => {
+    select: (id: any) => {
       setState((oldState) => ({
         ...oldState,
         [id]: {
@@ -82,7 +82,7 @@ export const ElementsModule = (props: IElementsModule) => {
         }
       }));
     },
-    deselect: (id) => {
+    deselect: (id: any) => {
       setState((oldState) => ({
         ...oldState,
         [id]: {
@@ -95,7 +95,7 @@ export const ElementsModule = (props: IElementsModule) => {
       setState((oldState) => Object.entries(oldState)
         .reduce((acc, [key, value]) => ({ ...acc, [key]: { ...value, isSelected: false } }), {}));
     },
-  }), []);
+  };
 
   return (
     <ElementsContext.Provider value={{ state, actions }}>
