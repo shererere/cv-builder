@@ -5,15 +5,13 @@ import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 import { useScale } from '@modules/scale';
 import { useElements } from '@modules/elements';
 import { updatePosition } from '@modules/elements/functions/update-position';
-import { BottomLeftHandle, BottomRightHandle, TopLeftHandle, TopRightHandle } from './handle';
+import { BottomLeftHandle, BottomRightHandle, TopLeftHandle, TopRightHandle, MoveHandle } from './handle';
 
 interface SelectionProps extends IEntity {
-  state: SelectionState;
   active: boolean;
 }
 
 interface WrapperProps extends IEntity {
-  state: SelectionState;
 }
 
 const Wrapper = styled.div.attrs((props: WrapperProps) => ({
@@ -45,7 +43,6 @@ export const Selection: React.FC<SelectionProps> = ({
   active,
   height,
   width,
-  state,
   x,
   y,
 }) => {
@@ -58,7 +55,6 @@ export const Selection: React.FC<SelectionProps> = ({
     width,
     height,
     scale,
-    state,
   };
 
   const draggableCoreProps = {
@@ -77,30 +73,17 @@ export const Selection: React.FC<SelectionProps> = ({
     return null;
   }
 
-  switch (state) {
-    case SelectionState.Move:
-      return (
-        <DraggableCore {...draggableCoreProps}>
-          <Wrapper {...wrapperProps}>
-          </Wrapper>
-        </DraggableCore>
-      );
-
-    case SelectionState.Resize:
-      return (
-        <Wrapper {...wrapperProps}>
-          <InnerWrapper>
-            <TopLeftHandle />
-            <TopRightHandle />
-            <BottomLeftHandle />
-            <BottomRightHandle />
-          </InnerWrapper>
-        </Wrapper>
-      );
-
-    default:
-      return (
-        <Wrapper {...wrapperProps} />
-      );
-  }
+  return (
+    <DraggableCore {...draggableCoreProps}>
+      <Wrapper {...wrapperProps}>
+        <InnerWrapper>
+          <MoveHandle />
+          <TopLeftHandle />
+          <TopRightHandle />
+          <BottomLeftHandle />
+          <BottomRightHandle />
+        </InnerWrapper>
+      </Wrapper>
+    </DraggableCore>
+  );
 }

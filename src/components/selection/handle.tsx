@@ -38,7 +38,7 @@ const BottomLeftHandleDiv = styled(HandleDiv)`
   border-left: solid 3px black;
 `;
 
-export const MoveHandleDiv = styled(HandleDiv)`
+export const MoveHandle = styled(HandleDiv)`
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
